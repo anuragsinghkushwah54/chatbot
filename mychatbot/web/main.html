@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zalgo Infotech | AI Chatbot</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        /* (Your CSS is perfect, no changes needed here) */
+        :root {
+            --bg-dark-navy: #0a192f;
+            --surface-navy: #112240;
+            --accent-cyan: #64ffda;
+            --accent-cyan-hover: rgba(100, 255, 218, 0.1);
+            --text-light-slate: #ccd6f6;
+            --text-slate: #8892b0;
+            --border-navy: rgba(100, 255, 218, 0.2);
+            --shadow-navy: rgba(2, 12, 27, 0.7);
+            --font-sans: 'Poppins', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-slate);
+            background-color: var(--bg-dark-navy);
+            min-height: 100vh;
+            display: grid;
+            place-content: center;
+            padding: 1rem;
+            background: linear-gradient(315deg, #0a192f, #1e3a5f, #0a192f);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .chatbot-container {
+            width: 100%;
+            max-width: 650px;
+            padding: 2.5rem;
+            background: rgba(17, 34, 64, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-navy);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 var(--shadow-navy);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards ease-out;
+        }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+        .header { text-align: center; margin-bottom: 2.5rem; }
+        .header h1 { font-size: 2rem; font-weight: 700; color: var(--text-light-slate); margin-bottom: 0.5rem; }
+        .header h1 span { color: var(--accent-cyan); }
+        .header p { font-size: 1rem; color: var(--text-slate); }
+        #prompt-container { display: flex; flex-direction: column; gap: 1rem; }
+        #prompt-input { width: 100%; background: var(--bg-dark-navy); color: var(--text-light-slate); border: 1px solid var(--border-navy); border-radius: 8px; padding: 14px; font-family: var(--font-sans); font-size: 1rem; resize: vertical; min-height: 100px; transition: border-color 0.3s, box-shadow 0.3s; }
+        #prompt-input::placeholder { color: var(--text-slate); }
+        #prompt-input:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 0 3px var(--accent-cyan-hover); }
+        #submit-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 12px 24px; font-family: var(--font-sans); font-size: 1rem; font-weight: 500; color: var(--accent-cyan); background-color: transparent; border: 1px solid var(--accent-cyan); border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
+        #submit-btn:hover { background-color: var(--accent-cyan-hover); transform: translateY(-2px); }
+        #submit-btn svg { width: 20px; height: 20px; stroke: var(--accent-cyan); }
+        h3 { margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-light-slate); font-weight: 600; border-bottom: 1px solid var(--border-navy); padding-bottom: 0.5rem; }
+        #result-container { background-color: var(--bg-dark-navy); border: 1px solid var(--border-navy); border-radius: 8px; padding: 1.5rem; min-height: 150px; white-space: pre-wrap; line-height: 1.7; font-family: var(--font-mono); color: var(--text-slate); }
+        footer { text-align: center; margin-top: 2rem; font-size: 0.8rem; color: var(--text-slate); opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <main class="chatbot-container">
+        <div class="header">
+            <h1>Zalgo Infotech <span>AI</span></h1>
+            <p>AI-Powered WordPress Solutions</p>
+        </div>
+
+        <div id="prompt-container">
+            <textarea id="prompt-input" rows="4" placeholder="Ask a question, describe a task, or give me a prompt..."></textarea>
+            <button id="submit-btn">
+                <span>Generate Response</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+
+        <h3>Response</h3>
+        <div id="result-container">The generated response will appear here.</div>
+        
+        <footer>
+            &copy; 2025 Zalgo Infotech. All rights reserved.
+        </footer>
+    </main>
+
+    <script>
+        const submitButton = document.getElementById('submit-btn');
+        const promptInput = document.getElementById('prompt-input');
+        const resultContainer = document.getElementById('result-container');
+
+        submitButton.addEventListener('click', async () => {
+            const prompt = promptInput.value;
+            if (!prompt) {
+                alert('Please enter a prompt!');
+                return;
+            }
+
+            resultContainer.innerHTML = 'Generating...';
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "contents": prompt })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Server Error:', errorData);
+                    resultContainer.innerHTML = `Error: ${errorData.error || 'Unknown server error'}`;
+                    return;
+                }
+
+                const data = await response.json();
+                resultContainer.innerHTML = data.text;
+
+            } catch (error) {
+                console.error('Network Error:', error);
+                resultContainer.innerHTML = 'A network error occurred. Please check the console and make sure the server is running.';
+            }
+        });
+    </script>
+
+</body>
+</html>

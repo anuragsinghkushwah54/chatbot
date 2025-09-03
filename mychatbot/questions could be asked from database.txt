@@ -1,0 +1,46 @@
+Of course! Now that you have a fully tuned RAG system, asking the right questions is key to seeing how well it performs. The goal is to check if it can find specific facts, summarize information, and, most importantly, admit when it doesn't know something.
+
+Here are the best questions to ask your bot, based on your `wordpress_data.txt` file.
+
+---
+
+### 1. Questions to Check for Specific Facts (Easy)
+
+These test if the retriever can find the exact piece of information in your data.
+
+* **"What are the health risks associated with Hormone Replacement Therapy (HRT)?"**
+    * **Why it's a good test:** The answer is a direct list in one of the articles (cancer, heart disease, stroke, etc.). A good answer proves the bot can find and relay precise facts.
+
+* **"What are the symptoms of fibromyalgia mentioned in the text?"**
+    * **Why it's a good test:** This requires the bot to find the article on fibromyalgia and list the symptoms like pain, fatigue, memory loss, and trouble sleeping.
+
+* **"What did a Russian study find when BIOSUPERFOOD was given to dairy cows?"**
+    * **Why it's a good test:** This is a very specific detail hidden within the article on osteoporosis. If the bot can answer this, your retriever is working exceptionally well.
+
+### 2. Questions to Check for Summarization (Medium)
+
+These require the bot to find several pieces of information and combine them into a helpful summary.
+
+* **"What is BIOSUPERFOOD?"**
+    * **Why it's a good test:** The description of BSF is spread across nearly every article. A great answer will synthesize these pieces, mentioning it's a blend of 4 microalgae that nourishes cells. This is a key test of the "Generation" part of your RAG system.
+
+* **"According to the articles, how can BIOSUPERFOOD help with menopause?"**
+    * **Why it's a good test:** It needs to combine the testimonials and the author's explanations to create a summary about reducing anxiety, hot flashes, and improving energy.
+
+* **"What is the author's general opinion on modern health 'rules'?"**
+    * **Why it's a good test:** This checks if the bot can understand the overall theme of the "4 horrid health rules" article and summarize the author's skepticism towards supplements, dieting, and fasting fads.
+
+### 3. Questions to Test the Rules (Crucial)
+
+These questions test the most important part of your prompt: **the instruction to NOT use outside knowledge.** The *only* correct answer to these is "I'm sorry, I don't have information on that topic..."
+
+* **"What is the price of BIOSUPERFOOD?"**
+    * **Why it's a good test:** As you saw, your bot answered this perfectly. The price is never mentioned, so it correctly admitted it didn't know. This proves it's not making things up ("hallucinating").
+
+* **"Who is Dr. Michael Kiriac?"**
+    * **Why it's a good test:** His name is mentioned as the creator, but there is no biography or background information. The bot should not invent details about him.
+
+* **"How many capsules of BIOSUPERFOOD should I take for period pain?"**
+    * **Why it's a good test:** While a testimonial mentions a specific dosage, the articles do not provide general medical advice. The bot should not act like a doctor. A perfect answer would be the "I'm sorry..." response.
+
+Start with the specific fact questions and work your way up. Thanks to the tuning you did on the chunking and retrieval, you should see much better and more relevant answers now!
