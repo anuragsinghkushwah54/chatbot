@@ -3,3 +3,5 @@ gunicorn
 langchain
 langchain-google-genai
 python-dotenv
+chromadb
+langchain-community
