@@ -7,33 +7,31 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 from operator import itemgetter 
+import json # ADDED: Required to parse JSON credentials from environment variable
 
 # --- Google Sheets Imports ---
 import gspread
 from google.oauth2.service_account import Credentials
 
 # --- LangChain/Qdrant Imports for RAG (FAST COLD START) ---
-from qdrant_client import QdrantClient # Needed to initialize the client
+from qdrant_client import QdrantClient
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_qdrant import QdrantVectorStore # Used for remote connection
-
-# --- External Modules ---
-# NOTE: fetch is no longer used for data loading/threading in app.py
-# import fetch # REMOVED: No longer needed for background fetch or setup
+from langchain_qdrant import QdrantVectorStore 
 
 # --- 1. Centralized Configuration ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MAPS_API_KEY = os.getenv("MAPS_API_KEY")
-QDRANT_HOST = os.getenv("QDRANT_HOST") # NEW: Required for remote Qdrant
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY") # NEW: Required for Qdrant Auth
+QDRANT_HOST = os.getenv("QDRANT_HOST")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+
+# NEW: Read JSON credentials securely from Vercel Environment Variable
+GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_SHEETS_CREDENTIALS") 
 
 COLLECTION_NAME = "zalgo-rag-collection"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-# IMPORTANT: This must be in your project root on Vercel
-SERVICE_ACCOUNT_FILE = 'credentials.json' 
 SHEET_NAME = "Zalgochatbot"
 
 if not OPENAI_API_KEY:
@@ -62,23 +60,26 @@ def reverse_geocode(lat, lon):
     except requests.exceptions.RequestException:
         return f"Lat: {lat}, Lon: {lon} (Geocode Failed)"
 
-# --- 3. Google Sheets Logging Function (Kept) ---
+# --- 3. Google Sheets Logging Function (UPDATED for Vercel) ---
 def log_to_google_sheet(user_data):
-    """Appends a row of data to the specified Google Sheet."""
+    """Appends a row of data to the specified Google Sheet using ENV credentials."""
+    # Check if credentials are set before attempting to log
+    if not GOOGLE_CREDENTIALS_JSON:
+        print("WARNING: Google Sheets logging skipped (Credentials not found).")
+        return
+
     try:
-        # NOTE: This relies on 'credentials.json' being present
-        creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        # Load credentials directly from the JSON string stored in the environment variable
+        creds_info = json.loads(GOOGLE_CREDENTIALS_JSON)
+        creds = Credentials.from_service_account_info(creds_info, scopes=SCOPES)
+        
         client = gspread.authorize(creds)
         sheet = client.open(SHEET_NAME).sheet1 
         sheet.append_row(user_data)
+        
     except Exception as e:
-        print(f"Google Sheet Logging Error: {e}")
+        print(f"FATAL Google Sheet Logging Error: {e}")
         traceback.print_exc()
-
-# --- 4. Background Data Fetching (REMOVED) ---
-# fetch_thread = threading.Thread(target=fetch.run_fetch_loop, daemon=True)
-# fetch_thread.start() 
-# ^ DELETED: This block causes timeouts on Serverless platforms.
 
 # --- 5. RAG Pipeline Setup (SIMPLIFIED FOR FAST COLD START) ---
 retrieval_chain = None
@@ -90,8 +91,7 @@ try:
     qdrant_client = QdrantClient(url=QDRANT_HOST, api_key=QDRANT_API_KEY)
     embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY) 
 
-    # 2. Connect to Existing Collection (Crucial: NO data loading/upserting here)
-    # The data must already be populated by the separate 'build_db.py' script.
+    # 2. Connect to Existing Collection (NO data loading/upserting here)
     vector_store = QdrantVectorStore(
         client=qdrant_client, 
         embeddings=embeddings, 
@@ -143,16 +143,24 @@ try:
     print("✅ RAG pipeline setup complete (connected to existing remote DB).")
 except Exception as e:
     print(f"FATAL RAG CONNECTION FAILURE (Check Vercel Environment Variables): {e}")
-    retriever = None # Explicitly set to None so the API route returns a clean error
+    retriever = None 
     traceback.print_exc()
 
-# --- 6. Flask Route ---
+# --- 6. Flask Routes ---
+
+@app.route("/", methods=["GET"])
+def home():
+    """Simple root route to confirm the server is running."""
+    if retriever is None:
+        return jsonify({"status": "error", "message": "RAG system failed to initialize. Check logs."}), 500
+    return jsonify({"status": "ok", "message": "Chatbot API is operational. Send POST request to /api/generate."})
+
+
 @app.route("/api/generate", methods=["POST"])
 def generate_api():
     
     global retriever
     if retriever is None:
-        # Returns 500 if the initialization failed in the try block above
         return jsonify({"error": "RAG system failed to initialize. Check Vercel logs for API key or connection errors."}), 500
 
     try:
@@ -198,5 +206,4 @@ def generate_api():
 
 # --- 7. Main Execution Block (Only for Local Testing) ---
 if __name__ == '__main__':
-    # This block is only for testing locally on your computer, Vercel ignores it.
     app.run(debug=True, port=5000, host='127.0.0.1')
