@@ -7,11 +7,11 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 from operator import itemgetter 
-import json # ADDED: Required to parse JSON credentials from environment variable
+#import json # ADDED: Required to parse JSON credentials from environment variable
 
 # --- Google Sheets Imports ---
-import gspread
-from google.oauth2.service_account import Credentials
+#import gspread
+#from google.oauth2.service_account import Credentials
 
 # --- LangChain/Qdrant Imports for RAG (FAST COLD START) ---
 from qdrant_client import QdrantClient
@@ -28,11 +28,11 @@ QDRANT_HOST = os.getenv("QDRANT_HOST")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 # NEW: Read JSON credentials securely from Vercel Environment Variable
-GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_SHEETS_CREDENTIALS") 
+#GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_SHEETS_CREDENTIALS") 
 
-COLLECTION_NAME = "zalgo-rag-collection"
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-SHEET_NAME = "Zalgochatbot"
+#COLLECTION_NAME = "zalgo-rag-collection"
+#SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+#SHEET_NAME = "Zalgochatbot"
 
 if not OPENAI_API_KEY:
     print("WARNING: OPENAI_API_KEY not found.")
@@ -61,7 +61,7 @@ def reverse_geocode(lat, lon):
         return f"Lat: {lat}, Lon: {lon} (Geocode Failed)"
 
 # --- 3. Google Sheets Logging Function (UPDATED for Vercel) ---
-def log_to_google_sheet(user_data):
+'''def log_to_google_sheet(user_data):
     """Appends a row of data to the specified Google Sheet using ENV credentials."""
     # Check if credentials are set before attempting to log
     if not GOOGLE_CREDENTIALS_JSON:
@@ -79,7 +79,7 @@ def log_to_google_sheet(user_data):
         
     except Exception as e:
         print(f"FATAL Google Sheet Logging Error: {e}")
-        traceback.print_exc()
+        traceback.print_exc()'''
 
 # --- 5. RAG Pipeline Setup (SIMPLIFIED FOR FAST COLD START) ---
 retrieval_chain = None
@@ -190,12 +190,12 @@ def generate_api():
         product_image_url = ""
 
         # Log data to Google Sheets (Runs in a separate thread)
-        log_thread = threading.Thread(
+       ''' log_thread = threading.Thread(
             target=log_to_google_sheet, 
             args=([user_name, user_email, datetime.datetime.now().strftime("%d/%b/%Y %H:%M:%S"), location, user_input, final_answer],), 
             daemon=True
         )
-        log_thread.start()
+        log_thread.start()'''
 
         return jsonify({"text": final_answer, "image_url": product_image_url})
 
@@ -207,3 +207,4 @@ def generate_api():
 # --- 7. Main Execution Block (Only for Local Testing) ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.1')
+
