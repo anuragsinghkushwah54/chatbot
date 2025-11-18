@@ -6,7 +6,7 @@ import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
-from operator import itemgetter 
+from operator import itemgetter
 import json # ADDED: Required to parse JSON credentials from environment variable
 
 # --- Google Sheets Imports ---
@@ -208,3 +208,4 @@ def generate_api():
 # --- 7. Main Execution Block (Only for Local Testing) ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.1')
+
