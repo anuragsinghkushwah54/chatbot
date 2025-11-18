@@ -19,7 +19,7 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_qdrant import QdrantVectorStore 
+from langchain_qdrant import QdrantVectorStore
 
 # --- 1. Centralized Configuration ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -208,5 +208,6 @@ def generate_api():
 # --- 7. Main Execution Block (Only for Local Testing) ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.1')
+
 
 
