@@ -94,7 +94,7 @@ try:
     # 2. Connect to Existing Collection (NO data loading/upserting here)
     vector_store = QdrantVectorStore(
         client=qdrant_client, 
-        embeddings=embeddings, 
+        embedding=embeddings, 
         collection_name=COLLECTION_NAME
     )
     
