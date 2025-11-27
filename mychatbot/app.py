@@ -103,7 +103,7 @@ try:
         search_kwargs={'k': 6}
     )
     
-    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model="gpt-4o-mini")
+    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model="gpt-5-nano-2025-08-07")
 
     prompt_template = ChatPromptTemplate.from_template("""
     You are an expert assistant for the website. Your task is to answer user questions accurately based ONLY on the provided context.
@@ -209,6 +209,7 @@ def generate_api():
 # --- 7. Main Execution Block (Only for Local Testing) ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.1')
+
 
 
 
