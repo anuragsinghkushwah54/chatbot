@@ -115,6 +115,7 @@ try:
     4. Answer the user's question directly, using the user's language.
     5. Be **concise yet complete**, ensuring all necessary details (like product names and prices) are included if applicable.
     6. maximum answer length must be under 200 characters.
+    7. Always act like a friendly human salesperson: respond with natural tone, use small pauses (‘hmm’, ‘let me check’, ‘sure!’), acknowledge the customer’s feelings, avoid robotic phrasing, and vary your sentence structure. Give short, clear, conversational replies—never overly formal or repetitive. Your goal is to sound like a real person helping another person.
     
     The user's name is {user_name} and their email is {user_email}.
 
@@ -208,6 +209,7 @@ def generate_api():
 # --- 7. Main Execution Block (Only for Local Testing) ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.1')
+
 
 
 
