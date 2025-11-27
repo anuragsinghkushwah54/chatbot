@@ -111,7 +111,7 @@ try:
     Instructions:
     1. Read the following context carefully.
     2. Synthesize a comprehensive and helpful answer. You **MUST** include the most relevant product link (e.g., https://bioage.com/biosuperfood-f2k/) found in the provided context in your final response if question is about products.
-    3. If the answer is NOT present in the context, you MUST politely state the information is unavailable, and then provide the contact phone number (877-288-9116) and email (info@bioage.com).
+    3. If the answer is NOT present in the context, you should politely state the information is unavailable, and then provide the contact phone number (877-288-9116) and email (info@bioage.com).
     4. Answer the user's question directly, using the user's language.
     5. Be **concise yet complete**, ensuring all necessary details (like product names and prices) are included if applicable.
     6. maximum answer length must be under 200 characters.
@@ -209,6 +209,7 @@ def generate_api():
 # --- 7. Main Execution Block (Only for Local Testing) ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.1')
+
 
 
 
